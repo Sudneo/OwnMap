@@ -1,4 +1,4 @@
-from Errors import PortMisuseError, UnknownProtocolError, PortOutOfRangeError
+from .Errors import UnknownProtocolError, PortOutOfRangeError
 
 
 class PortState:
@@ -47,7 +47,7 @@ class Port:
 
     def __init__(self, number, protocol_string):
         if 0 < number <= 65536:
-            self.port_number = number
+            self.__port_number = number
         else:
             raise PortOutOfRangeError("Ports can only be 1-65536. Value chosen: %s" % number)
         if protocol_string.lower() == "tcp":
@@ -68,16 +68,7 @@ class Port:
 
     @property
     def port_number(self):
-        return self.port_number
+        return self.__port_number
 
-    @port_number.setter
-    def port_number(self, value):
-        raise PortMisuseError("Cannot change the value of port %s with value %s." % (self.port_number, value))
-
-
-
-
-
-
-
-
+    def is_open(self):
+        return self.port_state == PortState.PORT_STATE_OPEN
