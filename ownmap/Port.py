@@ -40,10 +40,15 @@ class Port:
         - port_state: the state of the port (Open or Closed).
         - port_protocol: the port protocol (TCP or UDP).
         - process_running: an optional process running on that port.
+        - service: the service running on that port (e.g., SSH)
+        - product: the product that runs the service (e.g., OpenSSH)
+        - approved: boolean, True if the port is approved, False otherwise
     """
     port_state = PortState.PORT_STATE_CLOSED
     port_protocol = PortProtocol.PROT_OTHER
     process_running = None
+    approved = False
+    # TODO Add comment and approved field
 
     def __init__(self, number, protocol_string):
         if 0 < number <= 65536:
@@ -56,6 +61,9 @@ class Port:
             self.port_protocol = PortProtocol.PROT_UDP
         else:
             raise UnknownProtocolError("Port protocol must be TCP or UDP. Cannot be: %s." % protocol_string)
+        self.comment = ""
+        self.service = ""
+        self.product = ""
 
     def open(self):
         self.port_state = PortState.PORT_STATE_OPEN
@@ -72,3 +80,36 @@ class Port:
 
     def is_open(self):
         return self.port_state == PortState.PORT_STATE_OPEN
+
+    @property
+    def comment(self):
+        return self.comment
+
+    @comment.setter
+    def comment(self, value):
+        self.comment = value
+
+    def is_approved(self):
+        return self.approved
+
+    def approve(self):
+        self.approved = True
+
+    def disapprove(self):
+        self.approved = False
+
+    @property
+    def product(self):
+        return self.product
+
+    @product.setter
+    def product(self, value):
+        self.product = value
+
+    @property
+    def service(self):
+        return self.service
+
+    @service.setter
+    def service(self, value):
+        self.service = value
