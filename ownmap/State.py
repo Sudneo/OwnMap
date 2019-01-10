@@ -2,11 +2,11 @@ class StateDelta:
     """
     Helper class used to store the difference between two states.
     """
-    hosts_added = []
-    hosts_removed = []
 
     def __init__(self):
         self.host_differences = []
+        self.hosts_added = []
+        self.hosts_removed = []
 
     def add_host(self, host):
         self.hosts_added.append(host)
@@ -22,11 +22,11 @@ class StateDelta:
 
     @property
     def host_differences(self):
-        return self.host_differences
+        return self.__host_differences
 
     @host_differences.setter
     def host_differences(self, value):
-        self.host_differences = value
+        self.__host_differences = value
 
 
 class PortDelta:
@@ -39,6 +39,8 @@ class PortDelta:
     product_changed = False
     approved_changed = False
     comment_changed = False
+    old_port = None
+    new_port = None
 
     def __init__(self, port_a, port_b):
         if port_a.port_state != port_b.port_state:
@@ -53,21 +55,53 @@ class PortDelta:
             self.approved_changed = True
         if port_a.comment != port_b.comment:
             self.comment_changed = True
+        self.old_port = port_a
+        self.new_port = port_b
 
     def get_differences(self):
         delta = {
             'changes':
                 {
-                    'state': self.state_changed,
-                    'process': self.process_changed,
-                    'service': self.service_changed,
-                    'product': self.product_changed,
-                    'comment': self.comment_changed,
-                    'approved': self.approved_changed
+                    'state': {
+                        'changed': self.state_changed
+                    },
+                    'process': {
+                        'changed': self.process_changed
+                    },
+                    'service': {
+                        'changed': self.service_changed
+                    },
+                    'product': {
+                        'changed': self.product_changed
+                    },
+                    'comment': {
+                        'changed': self.comment_changed
+                    },
+                    'approved': {
+                        'changed': self.approved_changed
+                    }
                 }
                 }
+        if self.state_changed:
+            delta['changes']['state']['old'] = self.old_port.port_state
+            delta['changes']['state']['new'] = self.new_port.port_state
+        if self.process_changed:
+            delta['changes']['process']['old'] = self.old_port.process
+            delta['changes']['process']['new'] = self.new_port.process
+        if self.service_changed:
+            delta['changes']['service']['old'] = self.old_port.service
+            delta['changes']['service']['new'] = self.new_port.service
+        if self.product_changed:
+            delta['changes']['product']['old'] = self.old_port.product
+            delta['changes']['product']['new'] = self.new_port.product
+        if self.comment_changed:
+            delta['changes']['comment']['old'] = self.old_port.comment
+            delta['changes']['comment']['new'] = self.new_port.comment
+        if self.approved_changed:
+            delta['changes']['approved']['old'] = self.old_port.is_approved()
+            delta['changes']['approved']['new'] = self.new_port.is_approved()
         changes = self.state_changed or self.process_changed or self.service_changed or \
-                  self.product_changed or self.comment_changed or self.approved_changed
+            self.product_changed or self.comment_changed or self.approved_changed
         return delta, changes
 
 
@@ -75,12 +109,12 @@ class HostDelta:
     """
     Helper class used to store the difference (e.g., what changed) between two hosts with the same IP.
     """
-    alive_changed = False
-    dns_changed = False
-    ports_changed = False
-    ports_delta = None
 
     def __init__(self, host_a, host_b):
+        self.alive_changed = False
+        self.dns_changed = False
+        self.ports_changed = False
+        self.ports_delta = []
         if host_a.dns_name != host_b.dns_name:
             self.dns_changed = True
         if host_a.host_alive != host_b.host_alive:
@@ -88,7 +122,7 @@ class HostDelta:
         for port_a in host_a.get_ports():
             # for every port in the old state
             for port_b in host_b.get_ports():
-                if port_b.port_number == port_a.port_number and port_b.port_protocol == port_a.protocol:
+                if port_b.port_number == port_a.port_number and port_b.port_protocol == port_a.port_protocol:
                     # They are the same port, compare state and other fields.
                     delta, changed = PortDelta(port_a, port_b).get_differences()
                     if changed:
@@ -108,10 +142,10 @@ class HostDelta:
         return delta
 
 
-class State:
+class State(object):
     """
     This class abstracts the concept of a state. A state is a condition in which certain hosts have certain ports open
-    at a specific time (and date). The state is loaded from the database and saved back to it.
+    at a specific time (and date). The state is loaded from the db and saved back to it.
     """
 
     def __init__(self):
@@ -130,7 +164,7 @@ class State:
         pass
 
     def save(self):
-        # Save hosts to database
+        # Save hosts to db
         pass
 
     @property
@@ -178,4 +212,5 @@ class State:
             if not present:
                 state_delta.remove_host(host_a)
         # Compute port differences between hosts in a which are also in b
-        state_delta.host_differences = State.__hosts_delta(state_b.hosts, state_b.hosts)
+        state_delta.host_differences = State.__hosts_delta(state_a.hosts, state_b.hosts)
+        return state_delta.host_differences

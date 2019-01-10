@@ -4,7 +4,7 @@ import logging
 from .Port import Port
 
 
-class Host:
+class Host(object):
     """
     Class that abstracts the concept of host. Each host has several characteristics from OwnMap perspective.
     Each host has a unique IP address, an optional hostname, an optional dns name, optional SSH parameters to connect,
@@ -19,9 +19,6 @@ class Host:
          - ssh_username: the username to use for connecting via SSH (defaults to the user executing the tool).
          - ports[]: a list of (open) ports associated with the host.
     """
-    host_name = ""
-    dns_name = ""
-    ports = []
 
     def __init__(self, ip="", dns="", host_alive=False, ssh_available=False, ssh_username=""):
         assert ip != "" or dns != ""
@@ -71,6 +68,9 @@ class Host:
         self.host_alive = host_alive
         self.ssh_available = ssh_available
         self.ssh_username = ssh_username
+        self.ports = []
+        self.host_name = ""
+        self.dns_name = ""
 
     @property
     def ip_address(self):

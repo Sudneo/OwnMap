@@ -31,7 +31,7 @@ class PortProtocol:
         pass
 
 
-class Port:
+class Port(object):
     """
     Class that abstracts the concept of port. Each port has a protocol, a number and a state.
     In addition, ports can have an associated process object.
@@ -44,11 +44,7 @@ class Port:
         - product: the product that runs the service (e.g., OpenSSH)
         - approved: boolean, True if the port is approved, False otherwise
     """
-    port_state = PortState.PORT_STATE_CLOSED
     port_protocol = PortProtocol.PROT_OTHER
-    process_running = None
-    approved = False
-    # TODO Add comment and approved field
 
     def __init__(self, number, protocol_string):
         if 0 < number <= 65536:
@@ -61,9 +57,12 @@ class Port:
             self.port_protocol = PortProtocol.PROT_UDP
         else:
             raise UnknownProtocolError("Port protocol must be TCP or UDP. Cannot be: %s." % protocol_string)
+        self.approved = False
         self.comment = ""
         self.service = ""
         self.product = ""
+        self.process = ""
+        self.port_state = PortState.PORT_STATE_CLOSED
 
     def open(self):
         self.port_state = PortState.PORT_STATE_OPEN
@@ -83,11 +82,11 @@ class Port:
 
     @property
     def comment(self):
-        return self.comment
+        return self.__comment
 
     @comment.setter
     def comment(self, value):
-        self.comment = value
+        self.__comment = value
 
     def is_approved(self):
         return self.approved
@@ -100,16 +99,24 @@ class Port:
 
     @property
     def product(self):
-        return self.product
+        return self.__product
 
     @product.setter
     def product(self, value):
-        self.product = value
+        self.__product = value
 
     @property
     def service(self):
-        return self.service
+        return self.__service
 
     @service.setter
     def service(self, value):
-        self.service = value
+        self.__service = value
+
+    @property
+    def process(self):
+        return self.__process
+
+    @process.setter
+    def process(self, value):
+        self.__process = value

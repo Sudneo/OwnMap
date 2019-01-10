@@ -1,0 +1,5 @@
+postgresql:
+  host: localhost
+  database: portscan
+  user: postgres
+  password: password
