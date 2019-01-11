@@ -52,10 +52,13 @@ class Host(object):
             try:
                 ip_validated = ipaddress.ip_address(ip)
                 self.__ip_address = ip_validated
-                self.dns_name = socket.gethostbyaddr(str(ip_validated))[0]
-            except ValueError:
+            except (ValueError, socket.herror):
                 logging.error("IP address %s is not a valid IP.", ip)
                 raise ValueError("IP address %s is not a valid IP" % ip)
+            try:
+                self.dns_name = socket.gethostbyaddr(str(ip_validated))[0]
+            except socket.herror:
+                logging.warning("IP %s does not resolve to any DNS name.", str(ip_validated))
         else:
             # dns_name not "" and ip_addr ""
             self.dns_name = dns
