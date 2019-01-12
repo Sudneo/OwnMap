@@ -33,18 +33,20 @@ class Portscan(object):
         :param host: The host to scan
         :return: None
         """
-        host_object = Host.Host(host)
+        host_object = Host(host)
         nmap_scan = nmap.PortScanner()
         nmap_scan.scan(host, '1-100')
         try:
             # Check if the host was up.
             host_info = nmap_scan[host]
+            host_object.host_alive = True
         except KeyError:
             # If the host was down, mark it as non alive, add it to the state and return.
             logging.debug("Host %s is down." % host)
             host_object.host_alive = False
             self.state.add_hosts(host_object)
             return
+
         # If the host is alive check TCP ports
         try:
             # Check if there are tcp ports discovered
@@ -52,15 +54,19 @@ class Portscan(object):
             # For each port found
             for port in tcp_ports.keys():
                 # Create new port object and fill the information
-                port_object = Port.Port(port, 'tcp')
+                port_object = Port(port, 'tcp')
                 port_info = tcp_ports[port]
                 # If the port is open
                 if port_info['state'] == 'open':
                     port_object.open()
                     # Try to get service and product (e.g., HTTP, Nginx v1.10.3)
                     port_object.service = port_info['name']
-                    if len(port_info['product']) > 0 or len(port_info['version']) > 0:
-                        port_object.product = "%s v%s" % (port_info['product'], port_info['version'])
+                    product_version = port_info['version']
+                    if len(port_info['product']) > 0:
+                        product_string = port_info['product']
+                        if len(product_version) > 0:
+                            product_string = "%s v%s" % (product_string, product_version)
+                        port_object.product = product_string
                 else:
                     port.close()
                 host_object.add_port(port_object)
@@ -72,20 +78,24 @@ class Portscan(object):
             # For each port found
             for port in tcp_ports.keys():
                 # Create new port object and fill the information
-                port_object = Port.Port(port, 'udp')
+                port_object = Port(port, 'udp')
                 port_info = tcp_ports[port]
                 # If the port is open
                 if port_info['state'] == 'open':
                     port_object.open()
                     # Try to get service and product (e.g., HTTP, Nginx v1.10.3)
                     port_object.service = port_info['name']
-                    if len(port_info['product']) > 0 or len(port_info['version']) > 0:
-                        port_object.product = "%s v%s" % (port_info['product'], port_info['version'])
+                    product_version = port_info['version']
+                    if len(port_info['product']) > 0:
+                        product_string = port_info['product']
+                        if len(product_version) > 0:
+                            product_string = "%s v%s" % (product_string, product_version)
+                        port_object.product = product_string
                 else:
                     port.close()
                 host_object.add_port(port_object)
         except KeyError:
-            logging.info("No udp ports open on host %s." % host)
+            logging.info("No tcp ports open on host %s." % host)
         finally:
             self.state.add_hosts(host_object)
 
@@ -99,3 +109,5 @@ class Portscan(object):
         # Every call for scan host will scan a different host and will add the scanned host to the self.state
         thread_pool.map(self.scan_host, self.targets)
 
+    def save_state(self):
+        save_state(self.state)

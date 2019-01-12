@@ -60,7 +60,7 @@ def create_tables():
             ssh_available BOOLEAN,
             ssh_user VARCHAR(255),
             added DATE NOT NULL DEFAULT CURRENT_DATE,
-            last_modified DATE
+            last_modified TIMESTAMP
         )
         """,
         """ CREATE TABLE ports (
@@ -72,7 +72,7 @@ def create_tables():
                 protocol VARCHAR(20),
                 state VARCHAR(20),
                 added DATE NOT NULL DEFAULT CURRENT_DATE,
-                last_modified DATE,
+                last_modified TIMESTAMP,
                 approved BOOLEAN DEFAULT FALSE,
                 PRIMARY KEY (host_ip, port)
                 )
