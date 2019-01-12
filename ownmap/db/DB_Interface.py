@@ -1,5 +1,4 @@
 from ownmap.config.Config import ConfigReader
-from datetime import datetime
 import psycopg2
 import logging
 
@@ -69,7 +68,6 @@ def __save_port(port, ip):
     try:
         conn = psycopg2.connect(**params)
         cur = conn.cursor()
-        dt = datetime.now()
         insert_query = '''      
                                 INSERT INTO ports (host_ip, port, service, protocol, product, 
                                 state, last_modified, approved) 
@@ -93,7 +91,6 @@ def __save_host(host):
     try:
         conn = psycopg2.connect(**params)
         cur = conn.cursor()
-        dt = datetime.now()
         insert_query = '''      
                                    INSERT INTO hosts (host_ip, alive, dns_name, host_name, ssh_available, ssh_user, last_modified) 
                                    VALUES(%s, %s, %s, %s, %s, %s, %s)
