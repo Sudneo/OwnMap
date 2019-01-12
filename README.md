@@ -25,28 +25,29 @@ to catch backdoors.
 
 ## Status of development
 
-    - Core
-        - [x] Port Abstraction
-        - [x] Host Abstraction
-        - [x] State Abstraction
-    - Database
-        - [x] Initialization
-        - [ ] Load state
-        - [x] Save state
-        - [x] Load targets
-    - Scanning
-        - [x] Scan single host
-        - [x] Multithread scan 
-        - [x] Save result to DB
-        - [ ] Compute differences
-    - Reporting
-        - [ ] Generate HTML report
-        - [ ] Send email
-        - [ ] Slack integration
-        - [ ] LaTeX + Jinja for PDF report
-    - Web Frontend
-        - [ ] Main dashboard
-        - [ ] Add/Remove host functionality
-        - [ ] Pull old report functionality
-        - [ ] Change scanning configuration
-        - [ ] Run manual scan
+
+ - Core
+   - [x] Port Abstraction
+   - [x] Host Abstraction
+   - [x] State Abstraction
+- Database
+    - [x] Initialization
+    - [ ] Load state
+    - [x] Save state
+    - [x] Load targets
+- Scanning
+    - [x] Scan single host
+    - [x] Multithread scan 
+    - [x] Save result to DB
+    - [ ] Compute differences
+- Reporting
+    - [ ] Generate HTML report
+    - [ ] Send email
+    - [ ] Slack integration
+    - [ ] LaTeX + Jinja for PDF report
+- Web Frontend
+    - [ ] Main dashboard
+    - [ ] Add/Remove host functionality
+    - [ ] Pull old report functionality
+    - [ ] Change scanning configuration
+    - [ ] Run manual scan
