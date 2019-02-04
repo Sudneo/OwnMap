@@ -32,7 +32,7 @@ to catch backdoors.
    - [x] State Abstraction
 - Database
     - [x] Initialization
-    - [ ] Load state
+    - [X] Load state
     - [x] Save state
     - [x] Load targets
 - Scanning
