@@ -15,7 +15,7 @@ class Portscan(object):
     """
     def __init__(self):
         self.__targets = get_targets()
-        self.__state = State.State()
+        self.__state = State()
         self.__state.date = datetime.datetime.now()
 
     @property
@@ -33,7 +33,7 @@ class Portscan(object):
         :param host: The host to scan
         :return: None
         """
-        host_object = Host.Host(host)
+        host_object = Host(host)
         nmap_scan = nmap.PortScanner()
         nmap_scan.scan(host, '1-100')
         try:
@@ -54,7 +54,7 @@ class Portscan(object):
             # For each port found
             for port in tcp_ports.keys():
                 # Create new port object and fill the information
-                port_object = Port.Port(port, 'tcp')
+                port_object = Port(port, 'tcp')
                 port_info = tcp_ports[port]
                 # If the port is open
                 if port_info['state'] == 'open':
